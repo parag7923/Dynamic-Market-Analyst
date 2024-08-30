@@ -87,4 +87,4 @@ def analyze_market(symbol):
 
 def get_sentiment_analysis(text):
     # Placeholder for actual sentiment analysis
-    return {"label": "POSITIVE", "score": 0.98}  # Example sentiment
+    return {"label": "POSITIVE"}  # Example sentiment
