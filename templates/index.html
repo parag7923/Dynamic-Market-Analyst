@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Market Analyst</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 600px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #0073e6;
+        }
+        .input-group {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .input-group input {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 70%;
+            margin-right: 10px;
+        }
+        .input-group button {
+            padding: 10px 15px;
+            font-size: 16px;
+            background-color: #0073e6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .input-group button:hover {
+            background-color: #005bb5;
+        }
+        .market-info {
+            margin-bottom: 20px;
+        }
+        .market-info h2 {
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+        .news-item {
+            margin-bottom: 15px;
+        }
+        .news-item h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #0073e6;
+        }
+        .news-item p {
+            margin: 5px 0;
+        }
+        .news-item span {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Dynamic Market Analyst</h1>
+        </div>
+        <div class="input-group">
+            <input type="text" id="symbol" placeholder="Enter Stock Symbol (e.g., AAPL)">
+            <button onclick="analyzeStock()">Analyze</button>
+        </div>
+        <div id="results" class="market-info"></div>
+    </div>
+
+    <script>
+        async function analyzeStock() {
+            const symbol = document.getElementById('symbol').value;
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({symbol})
+                });
+                const data = await response.json();
+                displayResults(data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                document.getElementById('results').innerHTML = '<p>Failed to fetch data. Please try again.</p>';
+            }
+        }
+
+        function displayResults(data) {
+            const resultsContainer = document.getElementById('results');
+            
+            const openPrice = data.open_price || 'N/A';
+            const highPrice = data.high_price || 'N/A';
+            const lowPrice = data.low_price || 'N/A';
+            const closePrice = data.close_price || 'N/A';
+            const volume = data.volume !== undefined ? data.volume : 'N/A';
+            const totalChange = data.total_change || 'N/A';
+            const currentTrend = data.current_trend || 'No data available';
+            const globalImpact = data.global_impact || 'No data available';
+
+            resultsContainer.innerHTML = `
+                <h2>Market Summary for ${data.stock_symbol || 'Unknown'}</h2>
+                <p><strong>Open Price:</strong> ${openPrice}</p>
+                <p><strong>High Price:</strong> ${highPrice}</p>
+                <p><strong>Low Price:</strong> ${lowPrice}</p>
+                <p><strong>Close Price:</strong> ${closePrice}</p>
+                <p><strong>Volume:</strong> ${volume}</p>
+                <p><strong>Company Name:</strong> ${data.company_name || 'N/A'}</p>
+                <p><strong>Description:</strong> ${data.description || 'N/A'}</p>
+                <p><strong>Sector:</strong> ${data.sector || 'N/A'}</p>
+                <p><strong>Industry:</strong> ${data.industry || 'N/A'}</p>
+                <p><strong>Market Cap:</strong> ${data.market_cap || 'N/A'}</p>
+                <p><strong>Current Trend:</strong> ${currentTrend}</p>
+                <p><strong>Total Change:</strong> ${totalChange}</p>
+                <p><strong>Global Impact:</strong> ${globalImpact}</p>
+                <h2>Latest News</h2>
+                ${data.latest_news.length > 0 ? `
+                    <div class="news-item">
+                        <h3>${data.latest_news[0].title}</h3>
+                        <p>${data.latest_news[0].description}</p>
+                        <p><span>Sentiment:</span> ${data.latest_news[0].sentiment.label} (Score: ${(data.latest_news[0].sentiment.score * 100).toFixed(2)}%)</p>
+                    </div>
+                ` : '<p>No news available.</p>'}
+            `;
+        }
+    </script>
+</body>
+</html>
