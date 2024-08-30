@@ -1,0 +1,19 @@
+version: '3'
+services:
+  backend:
+    image: paragjadhav01/market-analyst-app
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
+
+  frontend:
+    image: paragjadhav01/market-analyst-frontend
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
